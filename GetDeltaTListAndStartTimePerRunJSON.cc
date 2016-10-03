@@ -4,12 +4,6 @@
 #include <fstream>
 #include <iostream>
 #include <map>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-
-using namespace boost::property_tree::json_parser;
-
-using namespace boost::property_tree;
 
 using std::size_t;
 using std::vector;
@@ -1410,7 +1404,7 @@ task monitoring
 
  delete hfile;
  
- ptree fileobj;
+
  
  //std::cout <<"Last line of the Noise Tool - End of "<<filein<<" " <<std::endl;
  //std::cout <<"  " <<std::endl;
@@ -1418,24 +1412,32 @@ task monitoring
  size_t firstUnderscore = filein.find("_"); 
  string towerName = filein.substr(firstUnderscore+1,filein.find("_run")-firstUnderscore-1);
  
+ 
+ ofstream OFS((resultsDirectory+towerName).c_str());
+ OFS << "{" << "\n";
+ 
+ unsigned mapcount = 0;
+ 
  for ( map<string, vector<unsigned> >::iterator itr = chamberName_deltaT_vector.begin() ; itr != chamberName_deltaT_vector.end() ; itr++ ){
-   
-   fileobj.add_child(itr->first,ptree());   
-   ptree array;
+   OFS << "\"" + itr->first + "\"" << ": {" << "\n" << "\"times\": [" ;
    for (unsigned i = 0 ; i < itr->second.size() ; i++){
-     unsigned Nseconds = itr->second.at(i);
-     //cout << itr->second.at(i);
-     ptree val;
-     val.put_value<double>(Nseconds);
      
-     array.push_back(std::make_pair("",val));
+     unsigned Nseconds = itr->second.at(i);
+     OFS << Nseconds ;
+     if (i+1 != itr->second.size()) OFS << ",";
+     
    }
-   fileobj.get_child(itr->first).add_child("times",array);
-   fileobj.get_child(itr->first).add<string>("startTime", towerStartTime);
-      
+   OFS << "]," << "\n"<< "\"startTime\": " << "\"" + towerStartTime << "\"" << " }";
+   if (mapcount+1 != chamberName_deltaT_vector.size()) OFS << ",";
+   OFS << "\n";
+   OFS.clear();
+   mapcount++;
   }
  
- boost::property_tree::write_json(resultsDirectory+towerName, fileobj);
+ OFS << "}";
+ OFS.close();
+ 
+ 
  //return 0;
 
  
