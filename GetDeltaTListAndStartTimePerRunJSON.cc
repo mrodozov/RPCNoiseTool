@@ -1,25 +1,33 @@
 #include "interface/LBNoise.h"
 #include <assert.h>
 #include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+
+using namespace boost::property_tree::json_parser;
+
+using namespace boost::property_tree;
 
 using std::size_t;
 using std::vector;
 using namespace std;
 
-void LBNoiseF(int _argc, char * _argv[]){
+void GetTimes(int _argc, char * _argv[]){
   
-  cout << " izstartd" << endl;
+  //cout << " izstartd" << endl;
   
   float rateThr = 30000.;  // 30 kHz threshold for dangerous noisy strips
   //  float rateThr = 3000.;  // 3 kHz threshold for noisy strips
   bool debug = false;
   bool strips = false;
   
-  if (_argc > 6)  debug  = atoi(_argv[6]);
-  if (_argc > 5) strips = atoi(_argv[5]);    // set "true" to fill in histos at the level of single strips 
-  
+   
   LBName lbnames(_argv[2],_argv[3]);
   std::string resultsDirectory = _argv[4];
+  std::string towerStartTime = _argv[5];
   
   if (_argc == 1) {
   
@@ -31,7 +39,7 @@ void LBNoiseF(int _argc, char * _argv[]){
     //return 0;
   }
     
-  cout << " file check passed " << endl;
+  //cout << " file check passed " << endl;
  
   std::string filein;
   filein=std::string(_argv[1]);
@@ -68,13 +76,13 @@ void LBNoiseF(int _argc, char * _argv[]){
   fileout.replace(0,pos+7,"Noise_");
   pos1 = filein.find(yearString);
  
- cout <<  "filein ok" << endl;
+ //cout <<  "filein ok" << endl;
   
  date = filein.substr (pos1,10);   
  std::string month = filein.substr(pos1+5,2);
- cout << "check-1" << endl;
+ //cout << "check-1" << endl;
  pos2 = pos1 + 8;
- cout << "check 0" << endl;
+ //cout << "check 0" << endl;
  if ((month.find("_")!=std::string::npos)) { //found underscore
    month = filein.substr(pos1+5,1);
    pos2 = pos1 + 7;
@@ -88,7 +96,7 @@ void LBNoiseF(int _argc, char * _argv[]){
    //  std::cout<<"day =  "<<day<<std::endl;
  }
  
- cout << " check 1" << endl;
+ //cout << " check 1" << endl;
  struct tm timeinfo;
 
  int mm = atoi(month.c_str());
@@ -112,7 +120,7 @@ void LBNoiseF(int _argc, char * _argv[]){
    //   std::cout<<"run =" <<run<<std::endl;
   }
 
-  cout << " check 2" << endl;
+ // cout << " check 2" << endl;
   
  std::string filetxt1=filein;
  std::string filetxt2=filein;
@@ -151,7 +159,7 @@ void LBNoiseF(int _argc, char * _argv[]){
  
  hfile->GetObject("tree",tree);
  if (tree) { 
-   cout << " File is with complete structure, continue " << endl;
+   //cout << " File is with complete structure, continue " << endl;
  }
 
   else {
@@ -170,10 +178,10 @@ void LBNoiseF(int _argc, char * _argv[]){
  // = dynamic_cast<TTree *>(hfile->Get("tree"));
  
  Int_t nevent = tree->GetEntries();
- std::cout <<"Number of Events "<<nevent<<std::endl;
+ //std::cout <<"Number of Events "<<nevent<<std::endl;
  TObjArray* oA = tree->GetListOfBranches();
  Int_t nbrs = oA->GetEntries();
- std::cout <<"Number of Branches " <<nbrs<<std::endl;
+ //std::cout <<"Number of Branches " <<nbrs<<std::endl;
  
  std::vector<LBNoise> cs;
  for (Int_t b=0;b<nbrs;b++){
@@ -181,7 +189,7 @@ void LBNoiseF(int _argc, char * _argv[]){
    cs.push_back(c);
  }
  
- TFile ana((resultsDirectory+"/"+fileout).c_str(),"RECREATE","Noise Results");
+ //TFile ana((resultsDirectory+"/"+fileout).c_str(),"RECREATE","Noise Results");
  std::vector<TH1F> hstrips;
  std::vector<TH1F> hstripsNM;
  std::vector<TH1F> hiss;
@@ -222,7 +230,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
    std::string cha(lbnames.chamber(branch));
   
    //qui
-   std::cout <<"BranchName "<<branch<<" Chamber "<<cha<<std::endl;
+  // std::cout <<"BranchName "<<branch<<" Chamber "<<cha<<std::endl;
 
    lbs.push_back(branch);                      // togliere?
    _brs->SetAddress(&(cs[brs]));
@@ -280,6 +288,8 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
 
  std::vector<const char*> label;
 
+ map<string, vector <unsigned> > chamberName_deltaT_vector;
+ 
 
  myfile5<<run<<"  "<<sec<<"\n";
  // myfile5<<" run# = "<<run<<" time = "<<sec<<"\n";
@@ -315,7 +325,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
    UInt_t nToMaskb = 0;
    
    if (debug) std::cout <<"  " <<std::endl;
-   if (!debug) std::cout <<"Analyzing now branch n. "<<brs+1<<" out of "<<nbrs<<" Chamber "<<cha<<std::endl; //qui
+   //if (!debug) std::cout <<"Analyzing now branch n. "<<brs+1<<" out of "<<nbrs<<" Chamber "<<cha<<std::endl; //qui
    
    double chamberarea =lbnames.areachamber(cha);
    double striparea   =lbnames.areastrip(cha);
@@ -328,9 +338,15 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
 
    if (debug) std::cout <<"Branch "<<brs+1<<" area chamber "<<chamberarea<<" area strip "<<striparea<<
      " number of strips "<<stripnumber<<" Chamber "<<cha<<std::endl; 
+   
+   vector<unsigned> delta_t_values;
 
 
    for (int l=0;l<96;l++){      
+     
+     if (l==1) break;
+     
+     // need only single channel to get the intervals
 
      Double_t ncount    = 0;
      Double_t nprev     = 0;
@@ -646,6 +662,8 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
      
      int total_time_single_strip_counter = 0;
      
+     
+     
      for (int i=0;i<nevent;i++) {
        TBranch *bn = tree->GetBranch(branch);
        bn->GetEntry(i);
@@ -671,7 +689,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
        if (diff < 0 ) {      //then there was an overflow, have to sum 2^(32)-1
 	 
 	 if (debug) std::cout << "Chamber= "<<cha<<" brs "<<brs+1<<" pin = "<<l+1<<" evt "<<i+1<<" delta t ="<<deltat<<" diff 1 = "<<diff<<std::endl;
-	 cout << " overflow appear here " << endl;
+	 //cout << " overflow appear here " << endl;
 	 diff = (pow(2,32)-1)-nprev+ncount;
 	 ncount = ncount + (pow(2,32)-1);   // need ncount later for masked
        }
@@ -688,7 +706,10 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
        float fl_deltat = deltat;
        
        rate =  fl_diff / fl_deltat;
-       cout << "Chamber= "<<cha<<" brs "<<brs+1<<" LBChannel = "<<l+1<<" evt "<<i+1<<" diff 2 = " << fl_diff<< " deltat " << fl_deltat <<  std::endl;
+       //cout << "Chamber= "<<cha<<" brs "<<brs+1<<" LBChannel = "<<l+1<<" evt "<<i+1<<" diff 2 = " << fl_diff<< " deltat " << fl_deltat <<  std::endl;
+       delta_t_values.push_back(fl_deltat);
+       
+       
        ratecm = rate/striparea;
        rates += rate; 
        ratescm = rates/striparea;
@@ -960,7 +981,10 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
     if (debug) std::cout << "brs="<<brs<<" rateb = "<<rateb<<" goodstrips = "<<goodstrips<<std::endl;
     if (debug) std::cout <<"Branch "<<brs+1<<" area chamber "<<chamberarea<<" area strip "<<striparea<<
       " number of strips "<<stripnumber<<" Chamber "<<cha<<std::endl; 
-
+    
+    chamberName_deltaT_vector[cha] = delta_t_values;
+    
+    
     // loop again over the strips and identify which ones...
 
     //////////////////////////////////////////////////////
@@ -1266,7 +1290,7 @@ task monitoring
  // std::cout<<"Chamber "<<brs+1<<" rate after masking "<<ratebNM<<std::endl;
 
  if (rateb < 5) {   // very low rate of the whole chamber before masking
-   std::cout<<"Attention!! Chamber "<<cha<<" rate unmasked "<<rateb<< " Hz      rate masked "<<ratebNM<< " Hz"<<std::endl;
+   //std::cout<<"Attention!! Chamber "<<cha<<" rate unmasked "<<rateb<< " Hz      rate masked "<<ratebNM<< " Hz"<<std::endl;
  myfile4<<"Chamber "<<cha<<" rate unmasked "<<rateb<< " Hz      rate masked "<<ratebNM<< " Hz \n";
  }
 
@@ -1348,7 +1372,7 @@ task monitoring
 
  // std::cout <<filein<<" " <<n_noisy_tot<< " "<<n_noisy15_tot<<" "<<n_noisy_totNM<<" "<<n_noisy15_totNM<<" "<<nMasked<<" "<<nMaskedBut<<" "<<n_noisy_tot2<< " "<<n_noisy_tot3<< " "<<rateAve_totNM<<" "<<float(timeTot/60.)<<std::endl;
 
- std::cout <<filein<<" " <<n_noisy_tot<< " "<<n_noisy15_tot<<" "<<n_noisy_totNM<<" "<<n_noisy15_totNM<<" "<<nMasked<<" "<<nMaskedBut<< " "<<rateAve_totNM<<" "<<float(timeTot/60.)<<std::endl;
+ //std::cout <<filein<<" " <<n_noisy_tot<< " "<<n_noisy15_tot<<" "<<n_noisy_totNM<<" "<<n_noisy15_totNM<<" "<<nMasked<<" "<<nMaskedBut<< " "<<rateAve_totNM<<" "<<float(timeTot/60.)<<std::endl;
    //std::cout << "   "<<std::endl;
 
 
@@ -1366,7 +1390,7 @@ task monitoring
  myfile3 <<"Noisy for more than 15' min in WIN data:   " <<n_noisy15_totNM<<"\n";
  myfile3 <<" "<< "\n";
 
- std::cout <<"  " <<std::endl;
+ //std::cout <<"  " <<std::endl;
  
  myfile1.close();
  myfile2.close();
@@ -1380,16 +1404,41 @@ task monitoring
  // ---------------------------------------------------------------------------------------------
 
 
- ana.Write();
+ //ana.Write();
  //ana.Close();  //gives invalid pointer for some Histos files
  // tree->Scan();
 
  delete hfile;
  
- std::cout <<"Last line of the Noise Tool - End of "<<filein<<" " <<std::endl;
- std::cout <<"  " <<std::endl;
+ ptree fileobj;
  
+ //std::cout <<"Last line of the Noise Tool - End of "<<filein<<" " <<std::endl;
+ //std::cout <<"  " <<std::endl;
+ 
+ size_t firstUnderscore = filein.find("_"); 
+ string towerName = filein.substr(firstUnderscore+1,filein.find("_run")-firstUnderscore-1);
+ 
+ for ( map<string, vector<unsigned> >::iterator itr = chamberName_deltaT_vector.begin() ; itr != chamberName_deltaT_vector.end() ; itr++ ){
+   
+   fileobj.add_child(itr->first,ptree());   
+   ptree array;
+   for (unsigned i = 0 ; i < itr->second.size() ; i++){
+     unsigned Nseconds = itr->second.at(i);
+     //cout << itr->second.at(i);
+     ptree val;
+     val.put_value<double>(Nseconds);
+     
+     array.push_back(std::make_pair("",val));
+   }
+   fileobj.get_child(itr->first).add_child("times",array);
+   fileobj.get_child(itr->first).add<string>("startTime", towerStartTime);
+      
+  }
+ 
+ boost::property_tree::write_json(resultsDirectory+towerName, fileobj);
  //return 0;
 
+ 
+ 
  
  }
