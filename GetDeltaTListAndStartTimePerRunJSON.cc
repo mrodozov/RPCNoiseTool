@@ -32,7 +32,7 @@ void GetTimes(int _argc, char * _argv[]){
     std::cout <<"  "<<std::endl;
     //return 0;
   }
-    
+  
   //cout << " file check passed " << endl;
  
   std::string filein;
@@ -161,13 +161,6 @@ void GetTimes(int _argc, char * _argv[]){
     exit(-1);
   }
  
- myfile1.open((resultsDirectory+"/"+filetxt1).c_str());
- myfile2.open((resultsDirectory+"/"+filetxt2).c_str());
- myfile3.open((resultsDirectory+"/"+filetxt3).c_str());
- myfile4.open((resultsDirectory+"/"+filetxt4).c_str());
- myfile5.open((resultsDirectory+"/"+filetxt5).c_str());
- myfile6.open((resultsDirectory+"/"+filetxt6).c_str());
- myfile7.open((resultsDirectory+"/"+filetxt7).c_str());
  
  // = dynamic_cast<TTree *>(hfile->Get("tree"));
  
@@ -285,7 +278,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
  map<string, vector <unsigned> > chamberName_deltaT_vector;
  
 
- myfile5<<run<<"  "<<sec<<"\n";
+ //myfile5<<run<<"  "<<sec<<"\n";
  // myfile5<<" run# = "<<run<<" time = "<<sec<<"\n";
  // myfile5<<" Roll "<<" N_masked_strips"<<" N_ToUnmask "<<" N_ToMask "<<" Rate_Hz "<<" Rate_Hz_cm2 "<<"\n";
 
@@ -758,7 +751,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
 	   if ((debug)&(i==5)) 
 	   std::cout << "LB_channel n. = "<<l+1<<" of chamber "<<cha <<" masked. FULL "<<ncount<<" WIN "<<ncountNM <<std::endl;
 
-	   if (i==0) myfile6 << "LB_Channel n. = "<<l+1<<" of chamber "<<cha <<" masked \n";
+	   //if (i==0) myfile6 << "LB_Channel n. = "<<l+1<<" of chamber "<<cha <<" masked \n";
  
 	 }
 	        }
@@ -887,7 +880,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
 	 if (debug) std::cout << " Strip n. = "<<l+1<<" of chamber "<<cha <<" noisy for " << float(timeNoisy/60.) << " minutes, with max rate "<<float(ratemax) <<" Hz/cm2 "<<std::endl;
 	 nToMask ++ ;
 	 nToMaskb ++ ;
-	 myfile1 << "LB_Channel n. = "<<l+1<<" of chamber "<<cha <<" noisy for " << float(timeNoisy/60.) << " minutes, with max rate "<<float(ratemax) <<" Hz/cm2 \n";
+	// myfile1 << "LB_Channel n. = "<<l+1<<" of chamber "<<cha <<" noisy for " << float(timeNoisy/60.) << " minutes, with max rate "<<float(ratemax) <<" Hz/cm2 \n";
        }
 
 
@@ -899,7 +892,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
 
 	 //if (debug) 
 	   std::cout << " Strip n. = "<<l+1<<" of chamber "<<cha <<" masked! But not noisy with max rate "<<ratemax<<" Hz/cm2 " <<std::endl;
-	 myfile2 << "LB_Channel n. = "<<l+1<<" of chamber "<<cha <<" is masked but not noisy with max rate "<<ratemax<<" Hz/cm2 \n" ;
+	// myfile2 << "LB_Channel n. = "<<l+1<<" of chamber "<<cha <<" is masked but not noisy with max rate "<<ratemax<<" Hz/cm2 \n" ;
        }
 
 
@@ -912,7 +905,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
        //       if (( isNo[brs*96+l] ==0 )&(isMasked[brs*96+l]==0)&(ratemax>0)&(ratemax<1)) {
 	 if (debug) std::cout << "Strip n. = "<<l+1<<" of chamber "<<cha <<" dead with max rate "<<ratemax
 			      <<" Hz/cm2 " <<std::endl;
-	 myfile7 << "LB_Channel n. = "<<l+1<<" of chamber "<<cha <<" (non masked) dead with max rate "<<ratemax<<" Hz/cm2 \n";
+	// myfile7 << "LB_Channel n. = "<<l+1<<" of chamber "<<cha <<" (non masked) dead with max rate "<<ratemax<<" Hz/cm2 \n";
 	 
 	 nDeadb ++ ;                 
 	 nDead ++ ;
@@ -1285,7 +1278,7 @@ task monitoring
 
  if (rateb < 5) {   // very low rate of the whole chamber before masking
    //std::cout<<"Attention!! Chamber "<<cha<<" rate unmasked "<<rateb<< " Hz      rate masked "<<ratebNM<< " Hz"<<std::endl;
- myfile4<<"Chamber "<<cha<<" rate unmasked "<<rateb<< " Hz      rate masked "<<ratebNM<< " Hz \n";
+ //myfile4<<"Chamber "<<cha<<" rate unmasked "<<rateb<< " Hz      rate masked "<<ratebNM<< " Hz \n";
  }
 
  hsummary12.SetFillColor(9);  
@@ -1326,7 +1319,7 @@ task monitoring
  rateAve_totNMcm = float(rateAve_totNM/chamberarea);  //rate in Hz/cm2, norm. to chamber area
  
 
- myfile5<<cha<<" "<<nDeadb<<" "<<nMaskedb<<" "<<nMaskedButb<<" "<<nToMaskb<<" "<<ratebNM<<" "<<ratebNMcm<<"\n";
+// myfile5<<cha<<" "<<nDeadb<<" "<<nMaskedb<<" "<<nMaskedButb<<" "<<nToMaskb<<" "<<ratebNM<<" "<<ratebNMcm<<"\n";
 
 
 
@@ -1371,7 +1364,7 @@ task monitoring
 
 
  // std::cout <<"End of "<<filein<<" " <<std::endl;
-
+/*
  myfile3 <<"Summary per tower - Input file "<< filein<< "\n";
  myfile3 <<"Total number of masked strips:             " <<nMasked<<"\n";
  myfile3 <<"Total number of masked strips to unmask:   " <<nMaskedBut<<"\n";
@@ -1393,7 +1386,7 @@ task monitoring
  myfile5.close();
  myfile6.close();
  myfile7.close();
-
+*/
 
  // ---------------------------------------------------------------------------------------------
 
