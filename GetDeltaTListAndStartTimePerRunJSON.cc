@@ -208,7 +208,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
  std::vector<bool> isNoisyAve;
  std::vector<bool> isMasked;
  std::vector<bool> isDisc;   
-
+ 
  
  
  for (Int_t brs=0;brs<nbrs;brs++){
@@ -328,10 +328,12 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
    
    vector<unsigned> delta_t_values;
 
-
+   
    for (int l=0;l<96;l++){      
      
      if (l==1) break;
+     
+     cout << l << endl;
      
      // need only single channel to get the intervals
 
@@ -485,8 +487,8 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
 	 striparea   = 250.152;}
        if ((cha.substr(3,4)=="4_3_")&(l>63)) {
 	 striparea   = 176.228;}
-	 
-	 
+ 
+ 
 
        chamberarea = chamberareaA+chamberareaB+chamberareaC;
        
@@ -647,20 +649,38 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
 	   }
      }
      
-     int total_time_single_strip_counter = 0;
+     int total_time_single_strip_counter = 0;          
      
+     cout << nevent << endl;
      
+     Int_t nprev_struct = 0;
      
      for (int i=0;i<nevent;i++) {
        TBranch *bn = tree->GetBranch(branch);
        bn->GetEntry(i);
        UInt_t deltat=cs[brs].stop_-cs[brs].start_;
        
+       
+       
        TObjArray *leaves  = bn->GetListOfLeaves();
+       TLeaf *startTime = (TLeaf*)bn->FindLeaf("startTime_"); // startTime
+       TLeaf *stopTime = (TLeaf*)bn->FindLeaf("stopTime_"); // stopTime
+       
+       Int_t time_start = startTime->GetValue(), time_stop = stopTime->GetValue();
+       
+       
+//        cout << "deltat stop " <<  cs[brs].stop_ << " deltat start " << cs[brs].start_ << " leaf stop " <<  time_stop << " leaf start " << time_start
+//        << " deltat " << deltat << " stop-start " << time_stop - time_start
+//        << " counts " ; 
+       
        TLeaf *leaf3 = (TLeaf*)leaves->UncheckedAt(3); // gets leaf binsFull_  (all counts)
        TLeaf *leaf4 = (TLeaf*)leaves->UncheckedAt(4); // gets leaf binsWin_   (only non-masked strips appear here)
-       Double_t ncount   = leaf3->GetValue(l);
-       Double_t ncountNM = leaf4->GetValue(l);
+       
+       Int_t ncount   = leaf3->GetValue(l);
+       Int_t ncountNM = leaf4->GetValue(l);
+       Int_t ncount_struct = cs[brs].binsF[l];
+       
+//        cout << ncount << " " << ncount_struct << " " << leaf3->GetLen() << endl;       
        
        timeTot += deltat;
        total_time_single_strip_counter += deltat;
@@ -670,8 +690,14 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
        bn->GetEntry(i-1);
        if (i > 0) nprev   = leaf3->GetValue(l);
        if (i > 0) nprevNM = leaf4->GetValue(l);
+       if (i > 0) nprev_struct = cs[brs].binsF[l];
+       
        
        diff  = ncount-nprev;  //single strip, single time interval
+       Int_t diff_struct = ncount_struct - nprev_struct;
+       
+//        cout << " difference from branch " << diff << " from struct " << diff_struct << endl;
+       
        
        if (diff < 0 ) {      //then there was an overflow, have to sum 2^(32)-1
 	 
@@ -681,8 +707,12 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
 	 ncount = ncount + (pow(2,32)-1);   // need ncount later for masked
        }
        
-       //std::cout << "Chamber= "<<cha<<" brs "<<brs+1<<" LBchannel = "<<l+1<<" evt "<<i+1<<" delta t ="<<deltat<<" diff  = "<<diff<<std::endl;
+//        if (deltat > 90){
        
+       std::cout << "Chamber= "<<cha<<" brs "<<brs+1<<" LBchannel = "<<l+1<<" evt "<<i+1<<" delta t ="<<deltat<<" diff  = "<<diff<< " stop-start time from branch map " 
+       << time_stop - time_start << " difference from struct map " << diff_struct << std::endl;       
+       
+//        }
        
        // x-check if fixed:
        if (diff < 0 ) {      
@@ -700,7 +730,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
        ratecm = rate/striparea;
        rates += rate; 
        ratescm = rates/striparea;
-
+       
        //       if (rate > ratemax) ratemax = rate; // was in Hz
 
        if (ratecm > ratemax) ratemax = ratecm;  //changed ratemax: now it is in Hz/cm2
