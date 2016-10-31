@@ -19,7 +19,7 @@ LBNoise : LBnoise.o LBName.o
 	g++ main.cpp -o LBNoise LBnoise.o LBName.o $(ROOTLIBS) $(ROOTINC) -std=c++14
 	
 GetDeltaTListAndStartTimePerRunJSON : GetTimes.o LBName.o
-	g++ main.cpp -o GetTimes GetTimes.o LBName.o $(ROOTLIBS) $(ROOTINC) -std=c++14
+	g++ main_gettimes.cpp -o GetTimes GetTimes.o LBName.o $(ROOTLIBS) $(ROOTINC) -std=c++14
 	
 MergeFiles: MergeRoots.cc
 	g++ MergeRoots.cc -o MergeRoots $(ROOTLIBS) $(ROOTINC) -std=c++14

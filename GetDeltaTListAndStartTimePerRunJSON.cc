@@ -654,6 +654,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
      cout << nevent << endl;
      
      Int_t nprev_struct = 0;
+     Double_t  norm_factor = 40000078; 
      
      for (int i=0;i<nevent;i++) {
        TBranch *bn = tree->GetBranch(branch);
@@ -684,6 +685,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
        ULong64_t timervalue = timervalue_ptr->GetValue();
        ULong64_t tvalue_byName = tvalue_byName_ptr->GetValue();
        ULong64_t tvalue_struct = cs[brs].timer;
+       Double_t timervalue_normalized = timervalue / norm_factor;
        
 //        cout << ncount << " " << ncount_struct << " " << leaf3->GetLen() << endl;       
        
@@ -715,7 +717,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
 //        if (deltat > 90){
        
        std::cout << "Chamber= "<<cha<<" brs "<<brs+1<<" LBchannel = "<<l+1<<" evt "<<i+1<<" delta t ="<<deltat<<" diff  = "<<diff<< " stop-start time from branch map " 
-       << time_stop - time_start << " difference from struct map " << diff_struct << " timer values: by index " << timervalue << " and by name " << tvalue_byName << " from the struct " << tvalue_struct<< std::endl;       
+       << time_stop - time_start << " difference from struct map " << diff_struct << " timer value " << timervalue_normalized << std::endl;
        
 //        }
        

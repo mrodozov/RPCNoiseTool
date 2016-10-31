@@ -649,7 +649,9 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
      for (int i=0;i<nevent;i++) {
        TBranch *bn = tree->GetBranch(branch);
        bn->GetEntry(i);
-       UInt_t deltat=cs[brs].stop_-cs[brs].start_;
+       //UInt_t deltat=cs[brs].stop_-cs[brs].start_;
+       ULong64_t timervalue = cs[brs].timer;
+       Double_t deltat = timervalue / 40000078;
        
        TObjArray *leaves  = bn->GetListOfLeaves();
        TLeaf *leaf3 = (TLeaf*)leaves->UncheckedAt(3); // gets leaf binsFull_  (all counts)
@@ -688,7 +690,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
        float fl_deltat = deltat;
        
        rate =  fl_diff / fl_deltat;
-       cout << "Chamber= "<<cha<<" brs "<<brs+1<<" LBChannel = "<<l+1<<" evt "<<i+1<<" diff 2 = " << fl_diff<< " deltat " << fl_deltat <<  std::endl;
+       //cout << "Chamber= "<<cha<<" brs "<<brs+1<<" LBChannel = "<<l+1<<" evt "<<i+1<<" diff 2 = " << fl_diff<< " deltat " << fl_deltat <<  std::endl;
        ratecm = rate/striparea;
        rates += rate; 
        ratescm = rates/striparea;
