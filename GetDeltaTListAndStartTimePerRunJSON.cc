@@ -327,7 +327,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
      " number of strips "<<stripnumber<<" Chamber "<<cha<<std::endl; 
    
    vector<unsigned> delta_t_values;
-
+    
    
    for (int l=0;l<96;l++){      
      
@@ -665,6 +665,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
        TObjArray *leaves  = bn->GetListOfLeaves();
        TLeaf *startTime = (TLeaf*)bn->FindLeaf("startTime_"); // startTime
        TLeaf *stopTime = (TLeaf*)bn->FindLeaf("stopTime_"); // stopTime
+       TLeaf *tvalue_byName_ptr = (TLeaf*)bn->FindLeaf("timerValue"); //        
        
        Int_t time_start = startTime->GetValue(), time_stop = stopTime->GetValue();
        
@@ -673,12 +674,16 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
 //        << " deltat " << deltat << " stop-start " << time_stop - time_start
 //        << " counts " ; 
        
+       TLeaf * timervalue_ptr = (TLeaf*)leaves->UncheckedAt(0);       
        TLeaf *leaf3 = (TLeaf*)leaves->UncheckedAt(3); // gets leaf binsFull_  (all counts)
        TLeaf *leaf4 = (TLeaf*)leaves->UncheckedAt(4); // gets leaf binsWin_   (only non-masked strips appear here)
        
        Int_t ncount   = leaf3->GetValue(l);
        Int_t ncountNM = leaf4->GetValue(l);
        Int_t ncount_struct = cs[brs].binsF[l];
+       ULong64_t timervalue = timervalue_ptr->GetValue();
+       ULong64_t tvalue_byName = tvalue_byName_ptr->GetValue();
+       ULong64_t tvalue_struct = cs[brs].timer;
        
 //        cout << ncount << " " << ncount_struct << " " << leaf3->GetLen() << endl;       
        
@@ -710,7 +715,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
 //        if (deltat > 90){
        
        std::cout << "Chamber= "<<cha<<" brs "<<brs+1<<" LBchannel = "<<l+1<<" evt "<<i+1<<" delta t ="<<deltat<<" diff  = "<<diff<< " stop-start time from branch map " 
-       << time_stop - time_start << " difference from struct map " << diff_struct << std::endl;       
+       << time_stop - time_start << " difference from struct map " << diff_struct << " timer values: by index " << timervalue << " and by name " << tvalue_byName << " from the struct " << tvalue_struct<< std::endl;       
        
 //        }
        
