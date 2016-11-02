@@ -17,7 +17,8 @@ int main (int argc,char * argv[]){
   vector<string> branchNames;
   vector<string> chambersNames;
   Double_t norm_factor = 40000078;
-  
+  size_t firstUnderscore = inputFile.find("_"); 
+  string towerName = inputFile.substr(firstUnderscore+1,inputFile.find("_run")-firstUnderscore-1);
   for (int entry = 0 ; entry < listOfObjects->GetEntries() ; entry++){
     //cout << listOfObjects->At(entry)->GetName() << " " << lb_name.chamber(listOfObjects->At(entry)->GetName()) << endl;
     string lb_string = listOfObjects->At(entry)->GetName();
@@ -27,7 +28,7 @@ int main (int argc,char * argv[]){
   
   // try to write a tree
   TFile * bonsaiche = new TFile(output_file.c_str(),"UPDATE");
-  TTree * myTree = new TTree("detailed_rate_tree", "tree title");
+  TTree * myTree = new TTree(towerName.c_str(), "tree title");
   
   int nEvents = inputLBtree->GetEntries();
   //cout << nEvents << endl;
