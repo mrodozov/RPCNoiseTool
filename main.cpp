@@ -8,7 +8,7 @@ int main (int argc,char * argv[]){
   
   //LBNoiseF(argc,argv);
   
-  string inputFile=argv[1] , lb_to_chamber_map = argv[2], strips_area=argv[3], output_file = argv[4];
+  string inputFile=argv[1] , lb_to_chamber_map = argv[2], strips_area=argv[3], output_file = argv[4], output_folder = argv[5],  towerStartTime = argv[6];
   
   TFile * inputLBfile = new TFile(inputFile.c_str(),"READ");  
   TTree * inputLBtree;  inputLBfile->GetObject("tree",inputLBtree);  
@@ -17,6 +17,9 @@ int main (int argc,char * argv[]){
   vector<string> branchNames;
   vector<string> chambersNames;
   Double_t norm_factor = 40000078;
+  
+  map<string, vector <double> > chamberName_deltaT_vector;
+  
   size_t firstUnderscore = inputFile.find("_"); 
   string towerName = inputFile.substr(firstUnderscore+1,inputFile.find("_run")-firstUnderscore-1);
   for (int entry = 0 ; entry < listOfObjects->GetEntries() ; entry++){
@@ -24,7 +27,13 @@ int main (int argc,char * argv[]){
     string lb_string = listOfObjects->At(entry)->GetName();
     branchNames.push_back(lb_string);    
     chambersNames.push_back(lb_string);
+    vector<double> time_durations_per_chamber;
+    chamberName_deltaT_vector[lb_name.chamber(lb_string)] = time_durations_per_chamber;
   }  
+  
+  // put the .json time files to come from here
+  
+  
   
   // try to write a tree
   TFile * bonsaiche = new TFile(output_file.c_str(),"UPDATE");
@@ -48,14 +57,18 @@ int main (int argc,char * argv[]){
     
     //cout << "event " << i << endl;
     
+    
+    
     for (int k = 0 ; k < numberOfChambers ; k++){
-      string nr_name = chambersNames.at(k);
+      string nr_name = lb_name.chamber(chambersNames.at(k));
       TBranch * lb_branch = inputLBtree->GetBranch(branchNames.at(k).c_str());
       
       TLeaf * timer = (TLeaf*)lb_branch->FindLeaf("timerValue"); //        
       TLeaf * interval_counts_leaf = (TLeaf*)lb_branch->FindLeaf("binsFull_");
       ULong64_t duration = timer->GetValue();
       Double_t duration_normalized = duration / norm_factor;
+      
+      chamberName_deltaT_vector.at(nr_name).push_back(duration_normalized);
       
       //cout << "chamber " << nr_name << " duration " << duration_normalized << endl;
       
@@ -82,6 +95,33 @@ int main (int argc,char * argv[]){
   myTree->Write();
   bonsaiche->Close();
   inputLBfile->Close();
+  
+ ofstream OFS((output_folder+towerName).c_str());
+ OFS << "{" << "\n";
+ 
+ 
+ 
+ unsigned mapcount = 0;
+ 
+ for ( map<string, vector<double> >::iterator itr = chamberName_deltaT_vector.begin() ; itr != chamberName_deltaT_vector.end() ; itr++ ){
+   OFS << "\"" + itr->first + "\"" << ": {" << "\n" << "\"times\": [" ;
+   for (unsigned i = 0 ; i < itr->second.size() ; i++){
+     
+     unsigned Nseconds = itr->second.at(i);
+     OFS << Nseconds ;
+     if (i+1 != itr->second.size()) OFS << ",";
+     
+   }
+   OFS << "]," << "\n"<< "\"startTime\": " << "\"" + towerStartTime << "\"" << " }";
+   if (mapcount+1 != chamberName_deltaT_vector.size()) OFS << ",";
+   OFS << "\n";
+   OFS.clear();
+   mapcount++;
+  }
+ 
+ OFS << "}";
+ OFS.close();
+ 
   
   /*
   cout << " out of writing " << endl;
