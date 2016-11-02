@@ -32,7 +32,7 @@ void LBNoiseF(int _argc, char * _argv[]){
   }
     
   cout << " file check passed " << endl;
- 
+  
   std::string filein;
   filein=std::string(_argv[1]);
 

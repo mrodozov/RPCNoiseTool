@@ -25,5 +25,10 @@ MergeFiles: MergeRoots.cc
 	g++ MergeRoots.cc -o MergeRoots $(ROOTLIBS) $(ROOTINC) -std=c++14
 
 clean:
-	rm -rf *.o *~ 
-	mv *.txt *.root results
+	find -type f -iname "LBNoise" -delete
+	find -type f -iname "GetDeltaTListAndStartTimePerRunJSON" -delete
+	find -type f -iname "GetTimes" -delete
+	find -type f -iname "MergeRoots" -delete;
+	find ./ -maxdepth 10 -type f -iname '*.o' -delete;
+	find ./ -maxdepth 10 -type f -iname '*~' -delete
+	find ./ -maxdepth 10 -type f -iname '*.lnxapp' -delete
