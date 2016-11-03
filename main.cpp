@@ -47,7 +47,7 @@ int main (int argc,char * argv[]){
   Double_t  chnls[numberOfChambers][96];
   Double_t prev_counts[numberOfChambers][96];
   for (int i = 0 ; i < numberOfChambers ; ++i){
-    myTree->Branch(chambersNames.at(i).c_str(),chnls[i]);
+    myTree->Branch(chambersNames.at(i).c_str(),chnls[i],(chambersNames.at(i)+"[96]/D").c_str());
   }
   
   //cout << numberOfChambers << endl;
@@ -80,7 +80,7 @@ int main (int argc,char * argv[]){
 	
 	Int_t counts = (i > 0) ? (interval_counts-prev_counts[k][j]) : (interval_counts);
 	Double_t rate = counts / duration_normalized;
-	//cout << " channel " << j+1 << " rate " << rate << " counts " << counts << " duration " << duration_normalized << endl;
+	cout << " channel " << j+1 << " rate " << rate << " counts " << counts << " duration " << duration_normalized << endl;
 	chnls[k][j] = rate;
 	prev_counts[k][j] = counts;
 	
@@ -123,30 +123,32 @@ int main (int argc,char * argv[]){
  OFS.close();
  
   
-  /*
+  
   cout << " out of writing " << endl;
   
   
   // read the tree
+  /*
+  TFile * bonsaiche_read = new TFile(output_file.c_str(),"READ");
+  TTree * tree; bonsaiche_read->GetObject("YEP3_near",tree);
+  int numberOfChambers = tree->GetListOfBranches()->GetEntries();
   
-  TFile * bonsaiche_read = new TFile("bonsai.root","READ");
-  TTree * tree; bonsaiche_read->GetObject("bonsai",tree);
   
-    
+  
   for (int i = 0 ; i < numberOfChambers; i++){
-    TBranch * aBranch =  tree->GetBranch(branchNames.at(i).c_str());
+    TBranch * aBranch =  tree->GetBranch(tree->GetListOfBranches()->At(i)->GetName());
     Double_t chnnls[96];
     tree->SetBranchAddress(aBranch->GetName(),&chnnls,&aBranch);
     
-    //cout << aBranch->GetName() << endl;
+    cout << aBranch->GetName() << endl;
     
     for(int j = 0 ; j < tree->GetEntries(); j++){
       aBranch->GetEntry(j+1);
       //cout << "entry " << j+1 << " channels " ;
       for (int ch = 0 ; ch < 96 ; ch ++){
-	//cout << chnnls[ch] << " ";
+	cout << chnnls[ch] << " ";
       }
-      //cout << endl;
+      cout << endl;
     }
     
     //cout << endl;
