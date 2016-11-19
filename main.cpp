@@ -6,14 +6,29 @@ using namespace std;
 
 int main (int argc,char * argv[]){
   
-  //LBNoiseF(argc,argv);
+  LBNoiseF(argc,argv);
   
+  /*
   string inputFile=argv[1] , lb_to_chamber_map = argv[2], strips_area=argv[3], output_file = argv[4], output_folder = argv[5],  towerStartTime = argv[6];
+  
+  
+  
   
   TFile * inputLBfile = new TFile(inputFile.c_str(),"READ");  
   TTree * inputLBtree;  inputLBfile->GetObject("tree",inputLBtree);  
   TObjArray* listOfObjects = inputLBtree->GetListOfBranches();
-  LBName  lb_name(lb_to_chamber_map,strips_area);   
+  
+  LBName  lb_name(lb_to_chamber_map,strips_area);
+  string aline;
+  
+  while(getline(IFS, aline)){
+    
+    cout  << aline << " " << lb_name.chamber(aline) << endl;
+    
+  }
+  
+  //cout << lb_name.chamber(inputFile) << endl;
+  
   vector<string> branchNames;
   vector<string> chambersNames;
   Double_t norm_factor = 40000078;
@@ -37,7 +52,9 @@ int main (int argc,char * argv[]){
   
   // try to write a tree
   TFile * bonsaiche = new TFile(output_file.c_str(),"UPDATE");
+  if (bonsaiche)
   TTree * myTree = new TTree(towerName.c_str(), "tree title");
+  
   
   int nEvents = inputLBtree->GetEntries();
   //cout << nEvents << endl;
@@ -125,10 +142,10 @@ int main (int argc,char * argv[]){
   
   
   cout << " out of writing " << endl;
-  
-  
-  // read the tree
+  */
   /*
+  // read the tree
+  
   TFile * bonsaiche_read = new TFile(output_file.c_str(),"READ");
   TTree * tree; bonsaiche_read->GetObject("YEP3_near",tree);
   int numberOfChambers = tree->GetListOfBranches()->GetEntries();

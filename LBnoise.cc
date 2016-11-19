@@ -14,9 +14,12 @@ void LBNoiseF(int _argc, char * _argv[]){
   //  float rateThr = 3000.;  // 3 kHz threshold for noisy strips
   bool debug = false;
   bool strips = false;
+  unsigned stop_after_N_secs = 0;
   
   if (_argc > 6)  debug  = atoi(_argv[6]);
   if (_argc > 5) strips = atoi(_argv[5]);    // set "true" to fill in histos at the level of single strips 
+  if (_argc > 7) stop_after_N_secs = atoi(_argv[7]);
+  
   
   LBName lbnames(_argv[2],_argv[3]);
   std::string resultsDirectory = _argv[4];
@@ -607,7 +610,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
      //RB4 Sectors 9 and 11:    only one chambers per station, type RB4-2000: 48 strips per LB.
      //                         Only the first 48 channels are connected. 
      //                         Non-connected: from 49 to 96.
-
+    
      ps1 = cha.find("RB4_9");       
      ps2 = cha.find("RB4_11");       
      if((ps1!=std::string::npos)||(ps2!=std::string::npos)) { 
@@ -616,10 +619,10 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
 	     if (debug) std::cout << " Strip n. = "<<l+1<<" of chamber "<<cha <<" is not connected " <<std::endl;
 	   }
      }
-
+    
      //RB4 Sector 4:  four chambers of type RB4-1500. 36 strips per roll (F/B), 72 strips per LB
      //               Non-connected: 1,2,15,16, 17,18,31,32, 33,34,47,48, 49,50,63,64, 65,66,79,80, 81,82,95,96
-
+    
      
      ps1 = cha.find("RB4_4");       
      if(ps1!=std::string::npos) { //found 
@@ -630,10 +633,10 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
 	     if (debug) std::cout << " Strip n. = "<<l+1<<" of chamber "<<cha <<" is not connected " <<std::endl;
 	   }
      }
-
+    
     //RB4 Sector 10:  two chambers of type RB4-2500. 60 strips per roll (F/B), 60 strips per LB
      //               Non-connected: 1,2,15,16,17,18,31,32,33,34,47,48,49,50,63,64,65,66 and from 79 on
-
+    
      
      ps1 = cha.find("RB4_10");       
      if(ps1!=std::string::npos) { //found 
@@ -790,13 +793,11 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
 
 //     cout << "current counter " << total_time_single_strip_counter << endl;
        
-//        if (total_time_single_strip_counter >= 3600 ) {
-// 	 cout << "time is: " << total_time_single_strip_counter << "one delta is: " << deltat << endl;
-// 	 break ; } // break the loop
-       
+       if ( stop_after_N_secs &&  total_time_single_strip_counter >= stop_after_N_secs ) {
+	 cout << "time is: " << total_time_single_strip_counter << " one delta is: " << deltat << endl; break ; } // break the loop
      } // nevent
-
-
+     
+     
      if(debug)       std::cout<<"Strip = "<<l+1<<" timeTot(s) = "<<timeTot<<" timeTot(m) = "<<timeTot/60.<<std::endl;
 
      if (float(timeNoisy/60.)>15.) {
