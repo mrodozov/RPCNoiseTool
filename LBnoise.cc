@@ -665,6 +665,9 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
        timeTot += deltat;
        total_time_single_strip_counter += deltat;
        
+       //if ( i+1 == nevent ) stop_after_N_secs = total_time_single_strip_counter;
+       
+       if (total_time_single_strip_counter < stop_after_N_secs ) continue;
        
        // get previous event (i.e. previous time interval)
        bn->GetEntry(i-1);
@@ -921,8 +924,8 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
 
 
        //repeat for bins_win
-       ratesNM   = ratesNM/((float)nevent); 
-       ratesNMcm = ratesNMcm/((float)nevent); 
+       ratesNM   = ratesNM/(float)1;//((float)nevent); 
+       ratesNMcm = ratesNMcm/(float)1;//((float)nevent); 
        ratebNM   += ratesNM; 
        //     ratebNMcm += ratesNMcm;
        ratebNMcm = ratebNM/chamberarea;         //norm. to chamber area 
