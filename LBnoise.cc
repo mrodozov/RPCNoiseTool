@@ -649,6 +649,8 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
      
      int total_time_single_strip_counter = 0;
      
+     unsigned total_counts = 0;
+     
      for (int i=0;i<nevent;i++) {
        TBranch *bn = tree->GetBranch(branch);
        bn->GetEntry(i);
@@ -667,7 +669,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
        
        //if ( i+1 == nevent ) stop_after_N_secs = total_time_single_strip_counter;
        
-       if (total_time_single_strip_counter < stop_after_N_secs ) continue;
+       //if (total_time_single_strip_counter < stop_after_N_secs ) continue;
        
        // get previous event (i.e. previous time interval)
        bn->GetEntry(i-1);
@@ -793,8 +795,10 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
        hstripsNM[brs*96+l].SetXTitle("Delta_t (time interval)");
        hstripsNM[brs*96+l].SetYTitle("Single strip rate (strip counts / s) (Hz)");
        }
-
+      
 //     cout << "current counter " << total_time_single_strip_counter << endl;
+       
+       total_counts ++;
        
        if ( stop_after_N_secs &&  total_time_single_strip_counter >= stop_after_N_secs ) {
 	 cout << "time is: " << total_time_single_strip_counter << " one delta is: " << deltat << endl; break ; } // break the loop
@@ -814,7 +818,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
      if (t_noisy > 0 ) {
        n_noisy++;  
        isNo[brs*96+l] = true;
-       percentage = (float)(t_noisy*100./nevent);
+       percentage = (float)(t_noisy*100./total_counts);
        if (percentage < 10) n_noisy10++;
        if (percentage > 10) percentage10++;
        if (percentage > 30) percentage30++;
@@ -823,7 +827,7 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
 	 n_noisy90++;
 	 isNoisy[brs*96+l] = true;
 	 //qui
-	 if (debug) std::cout << " Strip n. = "<<l+1<<" of chamber "<<cha <<" noisy for " <<t_noisy<<" intervals out of "<<nevent
+	 if (debug) std::cout << " Strip n. = "<<l+1<<" of chamber "<<cha <<" noisy for " <<t_noisy<<" intervals out of "<<total_counts
 			      <<" i.e. "<< percentage <<" %  with max rate "<<ratemax <<" Hz/cm2  and isNoisy = "<<isNoisy[brs*96+l]<<std::endl;
        }}
 
@@ -833,8 +837,8 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
      if (isDisc[brs*96+l] ==0) {   // only if the strip is not disconnected
 
 
-       rates = rates/((float)nevent);  //average rate of single strip over all time intervals
-       ratescm = ratescm/((float)nevent);  
+       rates = rates/((float)total_counts);  //average rate of single strip over all time intervals
+       ratescm = ratescm/((float)total_counts);  
 
        if (rates > 1) goodstrips++;
        if (rates > rateThr) {
@@ -924,8 +928,8 @@ TH2F hnoisy3("Rate noisy strips vs noise percentage", "Summary of # noisy strips
 
 
        //repeat for bins_win
-       ratesNM   = ratesNM/(float)1;//((float)nevent); 
-       ratesNMcm = ratesNMcm/(float)1;//((float)nevent); 
+       ratesNM   = ratesNM/((float)total_counts);//((float)nevent); 
+       ratesNMcm = ratesNMcm/((float)total_counts);//((float)nevent); 
        ratebNM   += ratesNM; 
        //     ratebNMcm += ratesNMcm;
        ratebNMcm = ratebNM/chamberarea;         //norm. to chamber area 
