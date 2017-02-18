@@ -1,14 +1,14 @@
 #ifndef ROOT_H
 #define ROOT_H
 
-/** 
- * In case of porting this code on another machine 
+/**
+ * In case of porting this code on another machine
  * it is mandatory to edit the path to this headers
  * in order to match the headers on your machine .
  * Be adviced  - and have a nice day :)
- * 
+ *
  * mrodozov@cern.ch
- * 
+ *
 */
 
 #include "TGaxis.h"
@@ -39,7 +39,7 @@
 #include "TPaveStats.h"
 #include "TFormula.h"
 #include "TMath.h"
-#include "TRandom.h" 
+#include "TRandom.h"
 #include "TFitResult.h"
 #include "TFitResultPtr.h"
 #include "TVectorF.h"

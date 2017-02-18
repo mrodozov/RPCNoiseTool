@@ -27,15 +27,15 @@
 #include "TText.h"
 #include "LBName.h"
 
-struct LBNoise{
-  
-  ULong64_t timer;
-  UInt_t  start_;
-  UInt_t  stop_;
-  UInt_t  binsF[96], binsW[96];
+struct LBNoise {
+
+    ULong64_t timer;
+    UInt_t  start_;
+    UInt_t  stop_;
+    UInt_t  binsF[96], binsW[96];
 };
 
 
-void GetTimes(int _argc, char * _argv[]);
+void GetTimes ( int _argc, char * _argv[] );
 
 #endif
