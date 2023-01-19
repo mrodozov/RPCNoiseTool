@@ -680,7 +680,7 @@ void LBNoiseF ( int _argc, char * _argv[] ) {
                 bn->GetEntry ( i );
                 //UInt_t deltat=cs[brs].stop_-cs[brs].start_;
                 ULong64_t timervalue = cs[brs].timer;
-                Double_t deltat = timervalue / 40000078;
+                Double_t deltat = timervalue / 40000078; // this normalization constant has something to do with the 4Mhz LHC sync with "something". I don't remember what and how anymore, but I'm adding this so it wont remain complete mistery
 
                 TObjArray *leaves  = bn->GetListOfLeaves();
                 TLeaf *leaf3 = ( TLeaf* ) leaves->UncheckedAt ( 3 ); // gets leaf binsFull_  (all counts)
